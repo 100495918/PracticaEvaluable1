@@ -9,7 +9,7 @@
 #define T_NUMBER 	1001
 #define T_OPERATOR	1002		
 #define T_VARIABLE  	1003
-void ParseE();
+void ParseE();  /// Declaramos las funciones aquí. 
 void ParseR();
 void ParseC();  
 
@@ -132,26 +132,26 @@ void MatchSymbol (int expected_token)
 											/// The actual recomendation is to use MatchSymbol in the code rather than theese macros
 
 
-void ParseYourGrammar ()
+void ParseYourGrammar () /// Funciona como axioma, llama al primer NoTerminal
 {
     ParseE();
 }
 
 void ParseE (){
-    /* E para dar n, v, R*/
+    /* El no terminal que genera los terminales v y n, o el no terminal R tras abrir paréntesis*/
 
     if (tokens.token == T_NUMBER){
-        printf("%d", tokens.number);
+        printf("%d", tokens.number); /// Se comprueba si es un número, en cuyo caso se imprime y se pasa al siguiente carácter
         MatchSymbol(T_NUMBER);
 
     }
 
     else if (tokens.token == T_VARIABLE){
-        printf("%s", tokens.variable_name);
+        printf("%s", tokens.variable_name); /// Se comprueba si es una variable
         MatchSymbol(T_VARIABLE);
     }
 
-    else if (tokens.token == '('){
+    else if (tokens.token == '('){ /// Si encuentra un paréntesis quiere decir que entre en (R asi que llama a la respectiva funcion
         MatchSymbol('(');
         ParseR();
     }
@@ -161,22 +161,23 @@ void ParseE (){
 }
 
 void ParseR(){
-    if (tokens.token == T_OPERATOR){
+    if (tokens.token == T_OPERATOR){ /// si encuentra algún operador quiere decir que entra en OEE)
+        /* Como es un traductor hay que imprimir las cosas en el orden que se quiere la salida, para ello se guarda el operador*/
         char operador = tokens.token_val;
         printf("(");
         MatchSymbol(T_OPERATOR);
         ParseE();
-        printf(" %c ", operador);
+        printf(" %c ", operador); /// Se imprime el operador entre medias de las dos Expresiones
         ParseE();
         printf(")");
         MatchSymbol(')');
     }
 
-    else if (tokens.token == '=' ){
+    else if (tokens.token == '=' ){ /// En caso de encontrar un igual se entiende que es una asignacion
         MatchSymbol('=');
         
-        if (tokens.token == T_VARIABLE){
-            char nombrevariable[8];
+        if (tokens.token == T_VARIABLE){ /// Hemos usado un condicional ya que despues de un = siempre tiene que haber una variable
+            char nombrevariable[8]; /// se guarda la variable para imprimir en el orden de salida.
             strcpy(nombrevariable, tokens.variable_name);
             MatchSymbol(T_VARIABLE);
             printf("(%s = ", nombrevariable);
@@ -190,7 +191,7 @@ void ParseR(){
             rd_syntax_error(0, tokens.token, "Error, carácter inesperado.");
         }
     }
-    else if (tokens.token == '?'){
+    else if (tokens.token == '?'){ /// En caso de encontrar un ? querrá decir que es ternario, así que se imprime todo como manda la salida
         MatchSymbol('?');
         printf("(");
         ParseE();
@@ -207,10 +208,10 @@ void ParseR(){
 }
 
 void ParseC(){
-    if (tokens.token == ')'){
+    if (tokens.token == ')'){ /// En caso de que al entrar en C se encuentre un ) querrá decir que era lambda así que sale.
         return;
     }
-    else if(tokens.token == T_NUMBER || tokens.token == T_VARIABLE || tokens.token == '('){
+    else if(tokens.token == T_NUMBER || tokens.token == T_VARIABLE || tokens.token == '('){ /// El segundo caso es que encuentre, cualquiera de los primeros de E.
         /* Es el caso de EE*/
 
         printf(" ? ");
